@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Forecast Web</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    body {
+      background: url('/static/gradient.png') no-repeat center center, radial-gradient(ellipse at bottom left, #4a1b6a 0%, #2d1b4e 30%, #1a0b2e 60%, #0a0a0a 100%);
+      background-size: cover;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      overflow-x: hidden;
+    }
+                .bg-gradient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      opacity: 1;
+      background-image: url('/static/gradient.jpg'), radial-gradient(ellipse at bottom left, #4a1b6a 0%, #2d1b4e 30%, #1a0b2e 60%, #0a0a0a 100%);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      pointer-events: none;
+      filter: none;
+    }
+    .main-flex {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 100vh;
+      width: 100%;
+      position: relative;
+      z-index: 10;
+      padding: 0 120px;
+      box-sizing: border-box;
+      max-width: 1400px;
+      margin: 0 auto;
+      background: transparent;
+    }
+    .info-section {
+      flex: 1;
+      color: #fff;
+      padding-right: 80px;
+      max-width: 45%;
+    }
+    .info-section h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 18px;
+      line-height: 1.1;
+    }
+    .info-section p {
+      font-size: 1.1rem;
+      color: #bfc9d1;
+      max-width: 500px;
+    }
+    .download-container {
+      position: relative;
+      z-index: 20;
+      width: 400px;
+      background: rgba(255,255,255,0.85);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+      padding: 36px 32px 32px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      flex-shrink: 0;
+    }
+    .download-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 18px;
+      text-align: left;
+      width: 100%;
+    }
+    .download-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .download-form input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #bfc9d1;
+      background: #f7fafc;
+    }
+    /* Tombol utama: panjang penuh, efek hover */
+    .main-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(53, 120, 229, 0.3);
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    #categorize-btn {
+      background: linear-gradient(135deg, #71b3ff 0%, #e3fa87 100%);
+      margin-bottom: 12px;
+    }
+    #categorize-btn:hover {
+      filter: brightness(1.1);
+      transform: scale(1.02);
+    }
+    #process-btn {
+      background: #3578e5;
+    }
+    #process-btn:hover {
+      background: #265ecb;
+      transform: scale(1.02);
+    }
+    .download-form button:disabled {
+      background: #bfc9d1;
+      color: #fff;
+      cursor: not-allowed;
+    }
+    #download-progress-bar-container {
+      width: 100%;
+      background: #e3e8ee;
+      border-radius: 8px;
+      height: 22px;
+      margin-bottom: 10px;
+      display: none;
+      position: relative;
+      overflow: hidden;
+    }
+    #download-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #3578e5 60%, #6ec1e4 100%);
+      width: 0%;
+      border-radius: 8px 0 0 8px;
+      transition: width 0.5s cubic-bezier(.4,2,.6,1);
+    }
+    #download-progress-label {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-50%);
+      color: #2a3b4c;
+      font-size: 0.95em;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-align: center;
+    }
+    #download-status {
+      margin-top: 10px;
+      color: #3578e5;
+      font-weight: 500;
+      text-align: center;
+      min-height: 24px;
+      padding: 8px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    #download-status.error {
+      background-color: rgba(231, 76, 60, 0.1);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+    }
+    #download-status.success {
+      background-color: rgba(39, 174, 96, 0.1);
+      border: 1px solid rgba(39, 174, 96, 0.3);
+    }
+    #download-status.info {
+      background-color: rgba(53, 120, 229, 0.1);
+      border: 1px solid rgba(53, 120, 229, 0.3);
+    }
+    .upload-instructions {
+      font-size: 0.98em;
+      color: #333;
+      margin-top: 8px;
+      margin-bottom: 8px;
+      line-height: 1.5;
+      text-align: left;
+    }
+    .upload-instructions ul {
+      margin: 4px 0 0 18px;
+      padding: 0;
+      font-size: 0.97em;
+      color: #333;
+      line-height: 1.4;
+    }
+    .upload-instructions code {
+      background: #f3f3f3;
+      color: #3578e5;
+      border-radius: 3px;
+      padding: 1px 4px;
+      font-size: 0.97em;
+    }
+    .dashboard-2col {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: flex-start;
+      width: 100%;
+      margin: 60px auto 80px auto;
+      padding: 0 100px;
+      gap: 100px;
+      position: relative;
+      z-index: 1;
+      max-width: 1400px;
+      box-sizing: border-box;
+    }
+    .dashboard-filters {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    .slicer-input, .slicer-dropdown {
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid #bfc9d1;
+      font-size: 1rem;
+      min-width: 180px;
+      background: #181828;
+      color: #fff;
+      cursor: text;
+    }
+    .slicer-dropdown {
+      min-width: 200px;
+      height: 44px;
+    }
+    .dashboard-content {
+      flex: 1 1 0;
+      max-width: 550px;
+      background: rgba(20,20,30,0.98);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+      padding: 50px 50px 50px 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+    .cards-row {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 30px;
+      margin-top: 15px;
+    }
+    .forecast-card {
+      background: linear-gradient(90deg, #101018 60%, #23234a 100%);
+      border: 2px solid #3578e5;
+      border-radius: 18px;
+      min-width: 140px;
+      min-height: 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      box-shadow: 0 2px 12px 0 rgba(31,38,135,0.10);
+    }
+    .card-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #6ec1e4;
+    }
+    .card-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #fff;
+    }
+    .month-range-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-left: 20px;
+    }
+    .month-range-input {
+      width: 120px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #bfc9d1;
+      background: #181828;
+      color: #fff;
+      font-size: 0.95em;
+      cursor: pointer;
+    }
+    /* Chart container styles - NO BORDERS */
+    #realtime-charts, #backtest-charts {
+      width: 100%;
+      margin-top: 20px;
+    }
+    #realtime-charts canvas, #backtest-charts canvas {
+      width: 100% !important;
+      height: 180px !important;
+      max-height: 180px;
+      border: none !important;
+      outline: none !important;
+    }
+    /* Remove any default chart borders */
+    .chartjs-render-monitor {
+      border: none !important;
+      outline: none !important;
+    }
+    /* Ensure no borders on chart containers */
+    canvas {
+      border: none !important;
+      outline: none !important;
+    }
+    .dashboard-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+    @media (max-width: 1200px) {
+      .dashboard-2col {
+        padding: 0 60px;
+        gap: 80px;
+      }
+      .dashboard-content {
+        max-width: 500px;
+        padding: 40px 40px 40px 40px;
+      }
+      #realtime-charts canvas, #backtest-charts canvas {
+        height: 160px !important;
+      }
+    }
+    @media (max-width: 900px) {
+      .main-flex {
+        flex-direction: column;
+        align-items: center;
+        padding: 0 20px;
+        justify-content: center;
+      }
+      .info-section {
+        padding-right: 0;
+        text-align: center;
+        max-width: 100%;
+        margin-bottom: 40px;
+      }
+      .download-container {
+        width: 100%;
+        max-width: 400px;
+      }
+      .dashboard-2col {
+        flex-direction: column;
+        align-items: center;
+        padding: 0 20px;
+        gap: 60px;
+        margin: 40px auto 60px auto;
+      }
+      .dashboard-filters {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .dashboard-content {
+        max-width: 98vw;
+        padding: 30px 30px 30px 30px;
+      }
+      .cards-row {
+        flex-direction: column;
+        gap: 15px;
+      }
+      #realtime-charts canvas, #backtest-charts canvas {
+        height: 140px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-gradient"></div>
+  
+  <!-- Upload Section -->
+  <div class="main-flex">
+    <div class="info-section">
+      <h1>Welcome to<br>Forecasting Parts Website</h1>
+      <p>
+        Upload Dataset (Excel File) Anda<br>
+        dan Dapatkan Prediksi Permintaan Part Number Kamu di Bulan Mendatang
+      </p>
+    </div>
+    <div class="download-container">
+      <div class="download-title">
+        <span style="font-size:1.25rem;font-weight:700;color:#222;">Halo!</span>
+        <div class="upload-instructions" style="margin-top:8px;margin-bottom:8px;">
+          <div style="font-size:1rem;font-weight:400;color:#222;">
+            Upload dataset (.xlsx) Anda di sini! (Max. 40 Part Number)<br>
+            Dataset history harus dari satu depo saja dan memiliki kolom berikut:
+            <span style="font-family:monospace;font-size:0.9em;">PART_NO, MONTH, ORIGINAL_SHIPPING_QTY atau ORDER_QTY</span><br>
+            <span style="font-size:0.85em;color:#666;">Kolom opsional (boleh ada boleh tidak):</span><br>
+            <span style="font-family:monospace;font-size:0.8em;color:#666;">PART_CATEGORY, INVENTORY_CONTROL_CLASS, WORKING_DAYS</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Tombol Categorize Demand -->
+      <button id="categorize-btn" class="main-btn">Categorize Demand</button>
+
+      <form id="download-form" class="download-form" autocomplete="off">
+        <input type="file" id="download-file-input" accept=".xlsx" required />
+        
+        <!-- Tombol Forecast -->
+        <button id="process-btn" type="button" class="main-btn">Forecast File</button>
+        
+        <div id="download-progress-bar-container">
+          <div id="download-progress-bar"></div>
+          <span id="download-progress-label">Processing...</span>
+        </div>
+        <div id="download-status"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard Section -->
+  <div class="dashboard-2col">
+    <div class="dashboard-content" id="realtime-dashboard-content">
+      <div class="dashboard-filters">
+        <input type="text" id="partno-input" placeholder="Cari Part Number" class="slicer-input" style="cursor: text;">
+        <div class="month-range-group">
+          <label for="realtime-month-picker" style="color:#bfc9d1;font-size:0.95em;margin-bottom:2px;">Pilih Bulan</label>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="text" id="realtime-month-picker" class="month-range-input" placeholder="Pilih rentang bulan" readonly style="cursor: pointer;">
+            <button id="realtime-month-clear" type="button" style="background:#3578e5;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:0.95em;cursor:pointer;">Clear</button>
+          </div>
+        </div>
+      </div>
+      <section id="realtime-dashboard">
+        <h2 class="dashboard-title">Prediksi Permintaan di Bulan Mendatang</h2>
+        <div class="cards-row">
+          <div class="forecast-card" id="card-icc">
+            <div class="card-title">ICC</div>
+            <div class="card-value" id="card-icc-value">-</div>
+          </div>
+          <div class="forecast-card" id="card-forecast-month1">
+            <div class="card-title" id="card-forecast-month1-title">Forecast</div>
+            <div class="card-value" id="card-forecast-month1-value">0</div>
+          </div>
+          <div class="forecast-card" id="card-forecast-month2">
+            <div class="card-title" id="card-forecast-month2-title">Forecast</div>
+            <div class="card-value" id="card-forecast-month2-value">0</div>
+          </div>
+        </div>
+        <div id="realtime-charts">
+          <canvas id="realtime-bar-chart" width="600" height="180"></canvas>
+          <canvas id="realtime-line-chart" width="600" height="180" style="margin-top:32px;"></canvas>
+        </div>
+      </section>
+    </div>
+    <div class="dashboard-content" id="backtest-dashboard-content">
+      <div class="dashboard-filters">
+        <div class="month-range-group">
+          <label for="backtest-month-picker" style="color:#bfc9d1;font-size:0.95em;margin-bottom:2px;">Pilih Bulan</label>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="text" id="backtest-month-picker" class="month-range-input" placeholder="Pilih rentang bulan" readonly style="cursor: pointer;">
+            <button id="backtest-month-clear" type="button" style="background:#3578e5;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:0.95em;cursor:pointer;">Clear</button>
+          </div>
+        </div>
+      </div>
+      <h2 class="dashboard-title">Hasil Pelatihan Prediksi di 4 Bulan Sebelumnya</h2>
+      <div class="cards-row">
+        <div class="forecast-card" id="card-backtest-qty">
+          <div class="card-title">Forecast QTY</div>
+          <div class="card-value" id="card-backtest-qty-value">0</div>
+        </div>
+        <div class="forecast-card" id="card-backtest-error">
+          <div class="card-title">Average Error</div>
+          <div class="card-value" id="card-backtest-error-value">0</div>
+        </div>
+      </div>
+      <div id="backtest-charts">
+        <canvas id="backtest-line-chart" width="600" height="180"></canvas>
+        <canvas id="backtest-bar-chart" width="600" height="180" style="margin-top:32px;"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart.js Local - HARUS DIMUAT SEBELUM script.js -->
+  <script src="/static/chart.js"></script>
+  <script>
+    // Pastikan Chart.js dan Flatpickr dimuat dengan benar
+    window.addEventListener('load', function() {
+      console.log('Page loaded, Chart.js status:', typeof Chart !== 'undefined');
+      if (typeof Chart !== 'undefined') {
+        console.log('✅ Chart.js loaded successfully from local file');
+      } else {
+        console.error('❌ Chart.js failed to load from local file');
+      }
+      
+      // Pastikan custom month picker berfungsi
+      console.log('Custom month picker status: OK');
+    });
+  </script>
+  <!-- Flatpickr akan dimuat secara lokal dari script.js -->
+  <!-- Script.js HARUS DIMUAT SETELAH Chart.js -->
+  <script src="/static/script.js" defer></script>
+</body>
+</html>
