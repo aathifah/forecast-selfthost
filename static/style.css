@@ -1,0 +1,440 @@
+/* Container utama dashboard */
+.dashboard-2col {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 100px;
+    padding: 60px 100px 60px 100px;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+    background: transparent;
+  }
+  
+  .dashboard-content {
+  background: rgba(20,20,30,0.75);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px 0 rgba(31,38,135,0.18);
+  padding: 50px 50px 50px 50px;
+  min-width: 440px;
+  max-width: 550px;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 32px;
+  position: relative;
+  z-index: 20;
+  overflow: visible;
+}
+  
+  .dashboard-filters {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  margin-bottom: 24px;
+  align-items: center;
+  width: 100%;
+  justify-content: flex-start;
+  position: relative;
+}
+  
+  .month-range-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 20px;
+  position: relative;
+}
+  .month-range-input {
+  width: 120px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #bfc9d1;
+  background: rgba(24,24,40,0.9);
+  color: #fff;
+  font-size: 0.95em;
+  cursor: pointer;
+  position: relative;
+}
+
+.month-calendar-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #181828;
+  border: 1px solid #3578e5;
+  border-radius: 4px;
+  padding: 16px;
+  z-index: 10000;
+  min-width: 280px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  margin-top: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+  pointer-events: auto;
+}
+  
+  .cards-row {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 30px;
+    margin-top: 15px;
+  }
+  .forecast-card {
+    background: linear-gradient(90deg, rgba(16,16,24,0.9) 60%, rgba(35,35,74,0.9) 100%);
+    border: 2px solid #3578e5;
+    border-radius: 18px;
+    min-width: 140px;
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    box-shadow: 0 2px 12px 0 rgba(31,38,135,0.10);
+  }
+  .card-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #6ec1e4;
+  }
+  .card-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #fff;
+  }
+  
+  /* Chart container styles - NO BORDERS */
+  #realtime-charts, #backtest-charts {
+    width: 100%;
+    margin-top: 20px;
+    display: block !important;
+    visibility: visible !important;
+    min-height: 200px;
+  }
+  
+  /* Remove chart borders */
+  #realtime-charts canvas, #backtest-charts canvas {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Remove any default chart borders */
+  .chartjs-render-monitor {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Ensure no borders on all canvas elements */
+canvas {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Custom Month Calendar Styles */
+.month-calendar-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #181828;
+  border: 1px solid #3578e5;
+  border-radius: 4px;
+  padding: 16px;
+  z-index: 9999;
+  display: none;
+  min-width: 280px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  margin-top: 4px;
+}
+
+/* Pastikan parent container memiliki position relative */
+.month-range-group {
+  position: relative;
+}
+
+/* Pastikan input memiliki position relative */
+#realtime-month-picker,
+#backtest-month-picker {
+  position: relative;
+}
+
+.month-calendar-container .year-header {
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.month-calendar-container .month-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.month-calendar-container .month-button {
+  padding: 8px 4px;
+  border: 1px solid #3578e5;
+  background-color: #181828;
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.month-calendar-container .month-button:hover {
+  background-color: #3578e5;
+  border-color: #4a9eff;
+}
+
+.month-calendar-container .month-button.disabled {
+  border: 1px solid #2a2a2a;
+  background-color: #2a2a2a;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.month-calendar-container .month-button.disabled:hover {
+  background-color: #2a2a2a;
+  border-color: #2a2a2a;
+}
+
+/* Month picker input styling */
+#realtime-month-picker,
+#backtest-month-picker {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #3578e5;
+  border-radius: 4px;
+  background-color: #181828;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+#realtime-month-picker:focus,
+#backtest-month-picker:focus {
+  outline: none;
+  border-color: #4a9eff;
+}
+  
+  #realtime-charts canvas, #backtest-charts canvas {
+    width: 100% !important;
+    height: 180px !important;
+    max-height: 180px;
+    display: block !important;
+    visibility: visible !important;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  .dashboard-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 20px;
+    width: 100%;
+  }
+  
+  /* Hapus semua CSS yang mengganggu layout upload */
+  /* .centered-upload, .download-container.centered-upload, .upload-section-wrapper, .main-flex-upload dihapus */
+  
+  @media (max-width: 1200px) {
+    .dashboard-2col {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 80px;
+      padding: 40px 60px 40px 60px;
+    }
+    .dashboard-content {
+      margin: 0 auto;
+      min-width: unset;
+      max-width: 500px;
+      padding: 40px 40px 40px 40px;
+    }
+    #realtime-charts canvas, #backtest-charts canvas {
+      height: 160px !important;
+    }
+  }
+  @media (max-width: 1100px) {
+    .dashboard-2col {
+      flex-direction: column;
+      align-items: center;
+      gap: 60px;
+      padding: 30px 60px 30px 60px;
+    }
+    .dashboard-content {
+      margin: 0 auto;
+      min-width: unset;
+      max-width: 98vw;
+    }
+    #realtime-charts canvas, #backtest-charts canvas {
+      height: 150px !important;
+    }
+  }
+  @media (max-width: 900px) {
+    .dashboard-2col {
+      flex-direction: column;
+      align-items: center;
+      padding: 0 20px;
+      gap: 40px;
+    }
+    .dashboard-content {
+      max-width: 98vw;
+      padding: 30px 30px 30px 30px;
+      min-width: unset;
+    }
+    .dashboard-filters {
+      flex-direction: column;
+      gap: 10px;
+    }
+    .cards-row {
+      flex-direction: column;
+      gap: 15px;
+    }
+    #realtime-charts canvas, #backtest-charts canvas {
+      height: 140px !important;
+    }
+  }
+  
+  .slicer-input, .slicer-dropdown {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #bfc9d1;
+    font-size: 1rem;
+    min-width: 180px;
+    background: rgba(24,24,40,0.9);
+    color: #fff;
+    cursor: text;
+  }
+  .slicer-dropdown {
+    min-width: 200px;
+    height: 44px;
+  }
+
+/* Process button styles */
+#process-btn {
+  background: linear-gradient(135deg, #3578e5 0%, #2d5aa0 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(53, 120, 229, 0.3);
+  margin-top: 16px;
+  min-width: 200px;
+}
+
+#process-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2d5aa0 0%, #1e3a6b 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(53, 120, 229, 0.4);
+}
+
+#process-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(53, 120, 229, 0.3);
+}
+
+#process-btn:disabled {
+  background: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Download form styles */
+.download-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+#download-file-input {
+  background: rgba(24,24,40,0.9);
+  border: 2px solid #3578e5;
+  border-radius: 8px;
+  padding: 12px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 300px;
+}
+
+#download-file-input:hover {
+  border-color: #2d5aa0;
+  background: rgba(24,24,40,0.95);
+}
+
+#download-file-input:focus {
+  outline: none;
+  border-color: #4a9eff;
+  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.2);
+}
+
+/* Progress bar styles */
+#download-progress-bar-container {
+  display: none;
+  width: 100%;
+  max-width: 400px;
+  background: rgba(24,24,40,0.9);
+  border-radius: 8px;
+  padding: 8px;
+  margin: 16px 0;
+}
+
+#download-progress-bar {
+  height: 8px;
+  background: linear-gradient(90deg, #3578e5 0%, #2d5aa0 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+#download-progress-label {
+  color: #bfc9d1;
+  font-size: 12px;
+  margin-top: 4px;
+  text-align: center;
+}
+
+/* Status message styles */
+#download-status {
+  color: #bfc9d1;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 8px;
+  min-height: 20px;
+}
+
+#download-status.success {
+  color: #4ade80;
+}
+
+#download-status.error {
+  color: #f87171;
+}
+
+#download-status.info {
+  color: #60a5fa;
+}
