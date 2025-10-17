@@ -1,0 +1,69 @@
+# Self-Hosting Docker Configuration
+FROM python:3.11-slim
+
+# Set environment variables untuk self-hosting
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONHASHSEED=0 \
+    PORT=8080 \
+    FORECAST_N_JOBS=2 \
+    FORECAST_PROGRESS=1 \
+    FORECAST_DEBUG=0 \
+    JOBLIB_TEMP_FOLDER=/tmp \
+    OMP_NUM_THREADS=2 \
+    OPENBLAS_NUM_THREADS=2 \
+    MKL_NUM_THREADS=2 \
+    VECLIB_MAXIMUM_THREADS=2 \
+    NUMEXPR_NUM_THREADS=2 \
+    MAX_DATA_ROWS=1000000 \
+    MAX_DATA_MONTHS=12 \
+    MAX_MEMORY_THRESHOLD=80 \
+    LSTM_ERROR_THRESHOLD=40
+
+# Set work directory
+WORKDIR /app
+
+# Install system dependencies untuk self-hosting
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libopenblas-dev \
+    liblapack-dev \
+    curl \
+    wget \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies dengan optimizations untuk self-hosting
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --upgrade setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Create necessary directories untuk self-hosting
+RUN mkdir -p /tmp/forecast_results && \
+    mkdir -p /tmp/forecast_cache && \
+    mkdir -p /app/data && \
+    mkdir -p /app/logs && \
+    mkdir -p static && \
+    chmod 755 /tmp/forecast_results && \
+    chmod 755 /tmp/forecast_cache && \
+    chmod 755 /app/data && \
+    chmod 755 /app/logs && \
+    chown -R 1000:1000 /app && \
+    chmod -R 755 /app
+
+# Expose port
+EXPOSE 8080
+
+# Health check untuk self-hosting
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/api/health || exit 1
+
+# Self-hosting optimized startup command
+CMD ["sh", "-c", "echo 'Starting self-hosted ML forecast service...' && echo 'Starting uvicorn server...' && uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 2 --timeout-keep-alive 60 --timeout-graceful-shutdown 15 --access-log --log-level info --limit-max-requests 1000 --limit-concurrency 50"]
