@@ -42,5 +42,8 @@ passlib[bcrypt]==1.7.4
 python-dateutil==2.8.2
 pytz==2023.3
 
+# HTTP requests untuk health check
+requests==2.31.0
+
 # Railway-specific optimizations
 gunicorn==21.2.0
